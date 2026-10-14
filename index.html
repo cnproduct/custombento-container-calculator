@@ -1,0 +1,2505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>耐科便当盒 3D 集装箱装柜测算工作台 · Naike 3D Container Loading Studio</title>
+<meta name="description" content="耐科餐具 (Naike Tableware / www.custombentofactory.com) 官方 3D 集装箱装箱装柜测算系统。针对儿童防漏便当盒、304可微波不锈钢餐盒、沙拉大碗、保温包等不同品类进行 20GP/40GP/40HQ 智能排柜、空间与重量利用率测算及出口报表导出。">
+<link rel="icon" href="images/logo.png" type="image/png">
+<!-- Google Fonts & FontAwesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg-dark: #0a0d12;
+    --panel-bg: #12171f;
+    --panel-sub: #1a212d;
+    --panel-border: #263142;
+    --brand-teal: #008290;
+    --brand-teal-light: #0ea5b6;
+    --brand-teal-glow: rgba(0, 130, 144, 0.35);
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-blue: #3b82f6;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    overflow: hidden;
+  }
+
+  /* Layout Structure */
+  #app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Top Navigation Bar */
+  header.top-header {
+    height: 58px;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    z-index: 100;
+  }
+  .brand-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-logo-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    border-radius: 6px;
+    background: #ffffff;
+    padding: 2px 6px;
+  }
+  .brand-titles h1 {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-titles h1 span.highlight {
+    color: var(--brand-teal-light);
+  }
+  .brand-titles .tagline {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge-tag {
+    background: rgba(0, 130, 144, 0.2);
+    color: var(--brand-teal-light);
+    border: 1px solid rgba(0, 130, 144, 0.4);
+    border-radius: 4px;
+    font-size: 10px;
+    padding: 1px 6px;
+    font-weight: 600;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-btn {
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    color: var(--text-main);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .nav-btn:hover {
+    background: var(--panel-border);
+    border-color: var(--brand-teal-light);
+    color: #fff;
+  }
+  .nav-btn.primary {
+    background: var(--brand-teal);
+    border-color: var(--brand-teal-light);
+    color: #ffffff;
+  }
+  .nav-btn.primary:hover {
+    background: var(--brand-teal-light);
+    box-shadow: 0 0 15px var(--brand-teal-glow);
+  }
+
+  /* Main Workspace */
+  .workspace {
+    flex: 1;
+    display: flex;
+    height: calc(100vh - 58px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Left Sidebar Control Panel */
+  aside.sidebar {
+    width: 440px;
+    min-width: 440px;
+    background: var(--panel-bg);
+    border-right: 1px solid var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    z-index: 20;
+  }
+  .sidebar-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+  .sidebar-scroll::-webkit-scrollbar { width: 6px; }
+  .sidebar-scroll::-webkit-scrollbar-thumb { background: var(--panel-border); border-radius: 3px; }
+
+  /* Section Styles */
+  .panel-box {
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 14px;
+  }
+  .panel-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .panel-box-header h2 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--brand-teal-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .pill-badge {
+    font-size: 10px;
+    padding: 2px 7px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: var(--text-muted);
+  }
+
+  /* Form Controls */
+  label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+    display: block;
+  }
+  select, input[type="text"], input[type="number"] {
+    background: var(--bg-dark);
+    border: 1px solid var(--panel-border);
+    color: var(--text-main);
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 12px;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  select:focus, input:focus {
+    border-color: var(--brand-teal-light);
+    box-shadow: 0 0 0 2px rgba(14, 165, 182, 0.2);
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  /* Category Quick Selector Carousel / Grid */
+  .category-selector-wrap {
+    margin-top: 8px;
+  }
+  .product-dropdown-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .category-preview-card {
+    background: var(--bg-dark);
+    border: 1px solid var(--panel-border);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .category-preview-card img {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--panel-border);
+    background: #111;
+  }
+  .preview-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .preview-info .sku-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .preview-info .sku-code {
+    font-size: 11px;
+    color: var(--brand-teal-light);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+  }
+  .preview-info .sku-dims {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .preset-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .btn-sm-action {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--panel-border);
+    background: var(--bg-dark);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .btn-sm-action:hover {
+    background: var(--panel-border);
+    color: #fff;
+    border-color: var(--brand-teal-light);
+  }
+  .btn-sm-action.primary-sub {
+    background: rgba(0, 130, 144, 0.18);
+    border-color: var(--brand-teal);
+    color: var(--brand-teal-light);
+  }
+  .btn-sm-action.primary-sub:hover {
+    background: var(--brand-teal);
+    color: #fff;
+  }
+
+  /* Box Table */
+  .table-responsive {
+    overflow-x: auto;
+    margin-top: 8px;
+  }
+  .box-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+  }
+  .box-table th {
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 10px;
+    text-align: center;
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .box-table td {
+    padding: 4px 2px;
+    vertical-align: middle;
+  }
+  .box-table input {
+    padding: 5px 3px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+  .box-table input.name-input {
+    text-align: left;
+    padding-left: 6px;
+  }
+  .color-picker-wrap {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 auto;
+    border: 1px solid var(--panel-border);
+    cursor: pointer;
+  }
+  .color-picker-wrap input[type="color"] {
+    width: 40px;
+    height: 40px;
+    transform: translate(-8px, -8px);
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+  .del-row-btn {
+    background: none;
+    border: none;
+    color: var(--accent-red);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .del-row-btn:hover {
+    background: rgba(239, 68, 68, 0.15);
+  }
+
+  /* Big Action Button */
+  .action-bar {
+    padding: 14px 16px;
+    background: var(--panel-bg);
+    border-top: 1px solid var(--panel-border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-calculate {
+    background: linear-gradient(135deg, #008290, #0ea5b6);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0, 130, 144, 0.4);
+    transition: all 0.2s;
+  }
+  .btn-calculate:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 130, 144, 0.6);
+  }
+  .action-sub-row {
+    display: flex;
+    gap: 8px;
+  }
+  .btn-sub {
+    flex: 1;
+    background: var(--panel-sub);
+    border: 1px solid var(--panel-border);
+    color: var(--text-main);
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.15s;
+  }
+  .btn-sub:hover {
+    border-color: var(--brand-teal-light);
+    color: #fff;
+  }
+
+  /* 3D Main Canvas Area */
+  main.canvas-main {
+    flex: 1;
+    position: relative;
+    background: radial-gradient(circle at 50% 35%, #182230 0%, #0a0d12 75%);
+    overflow: hidden;
+  }
+  #webgl-canvas-wrap {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Top Right 3D Viewport Controls */
+  .viewport-controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    z-index: 10;
+  }
+  .controls-row {
+    display: flex;
+    gap: 6px;
+  }
+  .view-chip {
+    background: rgba(18, 23, 31, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--panel-border);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .view-chip:hover {
+    border-color: var(--brand-teal-light);
+    color: #fff;
+  }
+  .view-chip.active {
+    border-color: var(--brand-teal-light);
+    color: var(--brand-teal-light);
+    background: rgba(0, 130, 144, 0.2);
+  }
+  .slider-chip {
+    background: rgba(18, 23, 31, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--panel-border);
+    padding: 6px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 170px;
+  }
+  .slider-chip input[type="range"] {
+    flex: 1;
+    accent-color: var(--brand-teal-light);
+  }
+
+  /* Top Left Stats & KPI Overlay */
+  .stats-overlay {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(18, 23, 31, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 16px;
+    width: 270px;
+    box-shadow: var(--card-shadow);
+    z-index: 10;
+  }
+  .stats-main-kpi {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .stats-main-kpi .big-number {
+    font-size: 34px;
+    font-weight: 800;
+    color: var(--brand-teal-light);
+    line-height: 1;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stats-main-kpi .big-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .utilization-bar-wrap {
+    height: 7px;
+    border-radius: 4px;
+    background: #242c38;
+    overflow: hidden;
+    margin: 8px 0 12px;
+  }
+  .utilization-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #10b981, #0ea5b6);
+    transition: width 0.5s ease;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+  }
+  .kpi-item .kpi-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .kpi-item .kpi-lbl {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .freight-kpi-highlight {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .freight-kpi-highlight .f-label {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .freight-kpi-highlight .f-val {
+    font-size: 14px;
+    font-weight: 700;
+    color: #38bdf8;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .unpacked-warning {
+    margin-top: 10px;
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #fbbf24;
+  }
+  .unpacked-warning.success {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: #34d399;
+  }
+
+  /* Bottom Left Legend Panel */
+  .legend-overlay {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    background: rgba(18, 23, 31, 0.88);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--panel-border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    max-width: 320px;
+    max-height: 220px;
+    overflow-y: auto;
+    font-size: 11px;
+    z-index: 10;
+  }
+  .legend-overlay h3 {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+    cursor: pointer;
+    user-select: none;
+    transition: opacity 0.15s;
+  }
+  .legend-item.hidden-box {
+    opacity: 0.35;
+    text-decoration: line-through;
+  }
+  .legend-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .legend-name {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .legend-counts {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--brand-teal-light);
+    font-weight: 600;
+  }
+
+  /* Bottom Right Helper HUD */
+  .hud-overlay {
+    position: absolute;
+    bottom: 16px;
+    right: 16px;
+    background: rgba(18, 23, 31, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--panel-border);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* 3D Raycaster Hover Tooltip */
+  #box-tooltip {
+    position: absolute;
+    background: rgba(15, 20, 28, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--brand-teal-light);
+    border-radius: 8px;
+    padding: 10px 12px;
+    pointer-events: none;
+    z-index: 200;
+    font-size: 11px;
+    color: #fff;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+    display: none;
+    transform: translate(15px, 15px);
+    max-width: 260px;
+  }
+  #box-tooltip .tt-title {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--brand-teal-light);
+    margin-bottom: 2px;
+  }
+  #box-tooltip .tt-sku {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  #box-tooltip .tt-grid {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 3px 8px;
+    color: var(--text-muted);
+  }
+  #box-tooltip .tt-grid span.v {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* Manifest Modal */
+  .modal-backdrop {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  .modal-backdrop.open {
+    display: flex;
+  }
+  .modal-content {
+    background: #151a23;
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    width: 820px;
+    max-width: 95vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+  }
+  .modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .modal-header h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+  .manifest-sheet {
+    background: #ffffff;
+    color: #0f172a;
+    padding: 24px;
+    border-radius: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .sheet-header {
+    border-bottom: 2px solid #008290;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .sheet-header .comp-name {
+    font-size: 18px;
+    font-weight: 800;
+    color: #008290;
+  }
+  .sheet-header .comp-sub {
+    font-size: 11px;
+    color: #64748b;
+  }
+  .sheet-header .doc-tag {
+    text-align: right;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .sheet-header .doc-tag strong {
+    font-size: 16px;
+    color: #0f172a;
+    display: block;
+  }
+  .sheet-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+    font-size: 11px;
+  }
+  .sheet-table th, .sheet-table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 8px;
+    text-align: left;
+  }
+  .sheet-table th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #334155;
+  }
+  .sheet-table td.num {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .sheet-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+  .sheet-summary-grid .s-box {
+    text-align: center;
+  }
+  .sheet-summary-grid .s-box .s-val {
+    font-size: 16px;
+    font-weight: 800;
+    color: #008290;
+  }
+  .sheet-summary-grid .s-box .s-lbl {
+    font-size: 10px;
+    color: #64748b;
+  }
+  .sheet-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 10px;
+  }
+  .modal-actions {
+    padding: 12px 20px;
+    border-top: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  /* Responsive Breakpoints */
+  @media (max-width: 1024px) {
+    aside.sidebar { width: 360px; min-width: 360px; }
+    .stats-overlay { width: 230px; }
+  }
+  @media (max-width: 768px) {
+    .workspace { flex-direction: column; }
+    aside.sidebar { width: 100%; min-width: 100%; height: 50vh; }
+    main.canvas-main { height: 50vh; }
+    .stats-overlay { top: 10px; left: 10px; width: 200px; padding: 10px; }
+  }
+
+  @media print {
+    body * { visibility: hidden; }
+    .modal-backdrop, .modal-backdrop * { visibility: visible; }
+    .modal-backdrop { position: absolute; left: 0; top: 0; background: none; }
+    .modal-content { border: none; box-shadow: none; width: 100%; }
+    .modal-actions, .modal-header button { display: none; }
+    .manifest-sheet { padding: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app-container">
+  <!-- TOP NAVIGATION BAR -->
+  <header class="top-header">
+    <div class="brand-area">
+      <img src="images/logo.png" alt="Naike Tableware Logo" class="brand-logo-img">
+      <div class="brand-titles">
+        <h1>
+          <span>Naike Tableware</span>
+          <span class="highlight">3D 集装箱装箱测算工作台</span>
+          <span class="badge-tag">OEM FACTORY</span>
+        </h1>
+        <div class="tagline">
+          <span>官网: <a href="https://www.custombentofactory.com" target="_blank" style="color:var(--brand-teal-light); text-decoration:none;">www.custombentofactory.com</a></span>
+          <span>•</span>
+          <span>厦门港 (XMN) 60km 快速集港</span>
+          <span>•</span>
+          <span class="badge-tag" style="background:rgba(16,185,129,0.15); color:#34d399; border-color:rgba(16,185,129,0.3);">Disney FAMA • Coca-Cola SGP • Sedex</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="nav-btn" id="lang-switch-btn"><i class="fa-solid fa-globe"></i> <span id="lang-text">EN / 中文</span></button>
+      <button class="nav-btn" id="open-manifest-btn"><i class="fa-solid fa-file-invoice"></i> <span data-i18n="btnManifest">导出装柜方案单</span></button>
+      <a href="https://www.custombentofactory.com/contact.html" target="_blank" class="nav-btn primary">
+        <i class="fa-solid fa-paper-plane"></i> <span data-i18n="btnInquire">获取外贸报价 (RFQ)</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="workspace">
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-scroll">
+        <!-- 1. CONTAINER SPEC -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h2><i class="fa-solid fa-ship"></i> <span data-i18n="secContainer">① 集装箱规格选择</span></h2>
+            <span class="pill-badge" id="container-cbm-badge">76.2 m³</span>
+          </div>
+          <label data-i18n="lblPreset">标准海运集装箱预设</label>
+          <select id="preset-selector">
+            <option value="589,235,239,21800">20GP 标准小柜 (589 × 235 × 239 cm · 限重 21.8T)</option>
+            <option value="1203,235,239,26680">40GP 平顶大柜 (1203 × 235 × 239 cm · 限重 26.68T)</option>
+            <option value="1203,235,269,26580" selected>40HQ 高顶大柜 (1203 × 235 × 269 cm · 限重 26.58T)</option>
+            <option value="1355,234,269,27500">45HQ 加长特种柜 (1355 × 234 × 269 cm · 限重 27.5T)</option>
+            <option value="custom">自定义尺寸 / Custom Dimensions...</option>
+          </select>
+          <div class="grid-3">
+            <div><label data-i18n="lblLength">长度 L (cm)</label><input id="cont-l" type="number" value="1203"></div>
+            <div><label data-i18n="lblWidth">宽度 W (cm)</label><input id="cont-w" type="number" value="235"></div>
+            <div><label data-i18n="lblHeight">高度 H (cm)</label><input id="cont-h" type="number" value="269"></div>
+          </div>
+          <div class="grid-2">
+            <div><label data-i18n="lblMaxWeight">安全载重 (kg)</label><input id="cont-max-weight" type="number" value="26580"></div>
+            <div><label data-i18n="lblOceanFreight">海运整柜预算 (USD $)</label><input id="ocean-freight" type="number" value="2800" placeholder="如 2800"></div>
+          </div>
+        </div>
+
+        <!-- 2. NAIKE PRODUCT LIBRARY -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h2><i class="fa-solid fa-box-open"></i> <span data-i18n="secProducts">② 耐科专属品类外箱库</span></h2>
+            <span class="pill-badge" style="background:rgba(0,130,144,0.2); color:var(--brand-teal-light);">14 款主力 SKU</span>
+          </div>
+
+          <label data-i18n="lblSelectProduct">快速选择耐科现模标准外箱</label>
+          <select id="naike-product-select"></select>
+
+          <div class="category-preview-card" id="category-preview">
+            <img src="images/eazylunch_kids_5_bento.jpg" alt="Product Image" id="pv-img">
+            <div class="preview-info">
+              <div class="sku-title" id="pv-name">儿童5格防漏便当盒</div>
+              <div class="sku-code" id="pv-sku">SKU: NK-KB5-001</div>
+              <div class="sku-dims" id="pv-desc">54 × 38 × 42 cm · 24 pcs/箱 · 14.5 kg</div>
+            </div>
+          </div>
+
+          <div class="preset-buttons">
+            <button class="btn-sm-action primary-sub" id="btn-fill-fcl" title="自动根据集装箱体积计算满柜最大箱数并装柜">
+              <i class="fa-solid fa-bolt"></i> <span data-i18n="btnFillFCL">一键整柜装满 (FCL)</span>
+            </button>
+            <button class="btn-sm-action" id="btn-add-to-list" title="将当前产品外箱加入装箱清单">
+              <i class="fa-solid fa-plus"></i> <span data-i18n="btnAddToList">加入拼柜列表</span>
+            </button>
+            <button class="btn-sm-action" id="btn-load-mixed" title="载入热销 4 款产品混装示例">
+              <i class="fa-solid fa-shuffle"></i> <span data-i18n="btnMixedSample">混装示例</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3. BOX LIST TABLE -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h2><i class="fa-solid fa-list-check"></i> <span data-i18n="secBoxList">③ 装箱外箱清单</span></h2>
+            <button class="btn-sm-action" id="btn-clear-table" style="flex:none; padding:3px 7px;"><i class="fa-solid fa-trash-can"></i> <span data-i18n="btnClear">清空</span></button>
+          </div>
+          <div class="table-responsive">
+            <table class="box-table">
+              <thead>
+                <tr>
+                  <th style="width:26%; text-align:left;" data-i18n="thName">品名/SKU</th>
+                  <th data-i18n="thL">长</th>
+                  <th data-i18n="thW">宽</th>
+                  <th data-i18n="thH">高</th>
+                  <th data-i18n="thPcs">只/箱</th>
+                  <th data-i18n="thQty">箱数</th>
+                  <th data-i18n="thWt">箱重</th>
+                  <th title="最大堆叠层数 (0或空为不限)" data-i18n="thStack">叠</th>
+                  <th data-i18n="thCol">色</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="box-table-body"></tbody>
+            </table>
+          </div>
+          <div style="margin-top: 8px;">
+            <button class="btn-sm-action" id="btn-add-custom-row" style="width:100%;">
+              <i class="fa-solid fa-plus-circle"></i> <span data-i18n="btnAddCustom">添加自定义外箱规格</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. PACKING OPTIONS -->
+        <div class="panel-box">
+          <div class="panel-box-header">
+            <h2><i class="fa-solid fa-sliders"></i> <span data-i18n="secOptions">④ 物理堆叠与防损约束</span></h2>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label data-i18n="lblRotation">旋转规则</label>
+              <select id="rot-mode">
+                <option value="2" selected>仅水平旋转 (保持正向向上)</option>
+                <option value="6">6 向任意翻转</option>
+                <option value="1">严禁旋转 (固定朝向)</option>
+              </select>
+            </div>
+            <div>
+              <label data-i18n="lblSupport">底面最小托底支撑率</label>
+              <input id="min-support" type="number" value="70" min="0" max="100">
+            </div>
+          </div>
+          <div style="font-size:10px; color:var(--text-dim); margin-top:6px; line-height:1.4;" data-i18n="supportNotice">
+            * 支撑率设定为 70%：箱体底部须有 70% 面积被柜底或下层箱顶托住，避免外贸长途海运颠簸导致纸箱塌陷。
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM PRIMARY ACTIONS -->
+      <div class="action-bar">
+        <button class="btn-calculate" id="btn-run-pack">
+          <i class="fa-solid fa-truck-ramp-box"></i> <span data-i18n="btnRunPack">立即执行 3D 智能装柜测算</span>
+        </button>
+        <div class="action-sub-row">
+          <button class="btn-sub" id="btn-replay-anim">
+            <i class="fa-solid fa-play"></i> <span data-i18n="btnReplay">装柜流水线动画</span>
+          </button>
+          <button class="btn-sub" id="btn-reset-cam">
+            <i class="fa-solid fa-arrows-rotate"></i> <span data-i18n="btnResetCam">复位视角</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- RIGHT 3D CANVAS & OVERLAYS -->
+    <main class="canvas-main">
+      <div id="webgl-canvas-wrap"></div>
+
+      <!-- STATS & KPI OVERLAY -->
+      <div class="stats-overlay">
+        <div class="stats-main-kpi">
+          <div class="big-number" id="kpi-util-big">0.0%</div>
+          <div class="big-label" data-i18n="kpiVolUtil">空间利用率</div>
+        </div>
+        <div class="utilization-bar-wrap">
+          <div class="utilization-bar-fill" id="kpi-util-bar"></div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-item">
+            <div class="kpi-val" id="kpi-packed-cartons">0 / 0</div>
+            <div class="kpi-lbl" data-i18n="kpiCartons">已装 / 计划箱数</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-pcs" style="color:var(--brand-teal-light);">0 Pcs</div>
+            <div class="kpi-lbl" data-i18n="kpiUnits">总产品只数 (Units)</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-weight">0 kg</div>
+            <div class="kpi-lbl" data-i18n="kpiWeight">货物总毛重</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-val" id="kpi-total-cbm">0 / 0 m³</div>
+            <div class="kpi-lbl" data-i18n="kpiCbm">装载 / 柜内容积</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-val" id="kpi-cog-offset">—</div>
+            <div class="kpi-lbl" data-i18n="kpiCog">重心偏移 (平衡度)</div>
+          </div>
+          <div class="kpi-item">
+            <div class="kpi-val" id="kpi-calc-time">0 ms</div>
+            <div class="kpi-lbl" data-i18n="kpiTime">装载计算耗时</div>
+          </div>
+        </div>
+
+        <!-- Ocean freight per unit highlight -->
+        <div class="freight-kpi-highlight">
+          <div class="f-label" data-i18n="lblAmortized">单只便当盒分摊海运费:</div>
+          <div class="f-val" id="kpi-freight-per-pc">$0.00 / pc</div>
+        </div>
+
+        <div class="unpacked-warning" id="kpi-unpacked-box">
+          <i class="fa-solid fa-circle-check"></i> <span data-i18n="readyMsg">准备就绪，点击开始装柜</span>
+        </div>
+      </div>
+
+      <!-- VIEWPORT TOOL CONTROLS -->
+      <div class="viewport-controls">
+        <div class="controls-row">
+          <div class="view-chip" id="cam-iso" title="等轴 3D 视角"><i class="fa-solid fa-cube"></i> 3D</div>
+          <div class="view-chip" id="cam-front" title="集装箱大门正视"><i class="fa-solid fa-door-open"></i> 箱门</div>
+          <div class="view-chip" id="cam-side" title="侧向长边透视"><i class="fa-solid fa-arrows-left-right"></i> 侧面</div>
+          <div class="view-chip" id="cam-top" title="正上方俯视"><i class="fa-solid fa-arrow-down"></i> 俯视</div>
+        </div>
+        <div class="controls-row">
+          <div class="view-chip active" id="tgl-walls"><i class="fa-solid fa-border-all"></i> <span data-i18n="tglWalls">柜壁</span></div>
+          <div class="view-chip" id="tgl-edges"><i class="fa-solid fa-cubes"></i> <span data-i18n="tglEdges">描边</span></div>
+          <div class="view-chip" id="tgl-explode"><i class="fa-solid fa-layer-group"></i> <span data-i18n="tglExplode">分层展开</span></div>
+        </div>
+        <div class="slider-chip">
+          <span data-i18n="lblSlice">高度切片</span>
+          <input id="slice-slider" type="range" min="0" max="100" value="100">
+        </div>
+      </div>
+
+      <!-- BOTTOM LEFT LEGEND -->
+      <div class="legend-overlay">
+        <h3><span data-i18n="lblLegend">箱型图例 (点击隐藏)</span> <span id="legend-total-sku">0 SKU</span></h3>
+        <div id="legend-items-wrap"></div>
+      </div>
+
+      <!-- BOTTOM RIGHT HUD -->
+      <div class="hud-overlay" id="hud-text">
+        左键旋转 · 滚轮缩放 · 右键平移 · 悬停查看纸箱参数
+      </div>
+
+      <!-- 3D HOVER RAYCASTER TOOLTIP -->
+      <div id="box-tooltip">
+        <div class="tt-title" id="tt-name">品名</div>
+        <div class="tt-sku" id="tt-sku">SKU</div>
+        <div class="tt-grid">
+          <span>外箱尺寸:</span><span class="v" id="tt-dims">--</span>
+          <span>装箱数量:</span><span class="v" id="tt-pcs">--</span>
+          <span>单箱重量:</span><span class="v" id="tt-wt">--</span>
+          <span>空间坐标:</span><span class="v" id="tt-pos">--</span>
+          <span>堆码层数:</span><span class="v" id="tt-layer">--</span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- CONTAINER LOADING MANIFEST & EXPORT MODAL -->
+<div class="modal-backdrop" id="manifest-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-file-invoice"></i> <span data-i18n="modalTitle">耐科外贸集装箱装载方案与装箱单 (Loading Manifest)</span></h3>
+      <button class="del-row-btn" id="btn-close-modal" style="font-size:18px; color:var(--text-muted);"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="manifest-sheet" id="print-sheet">
+        <div class="sheet-header">
+          <div>
+            <div class="comp-name">JINJIANG NAIKE GIFTS CO., LTD.</div>
+            <div class="comp-sub">晋江市耐克礼品玩具有限公司 · 官方制造出海工厂</div>
+            <div class="comp-sub">Website: www.custombentofactory.com · Email: info@naikegroup.com · Port: Xiamen Port (XMN)</div>
+          </div>
+          <div class="doc-tag">
+            <strong>CONTAINER LOADING PLAN</strong>
+            <span>Date: <span id="sheet-date"></span></span>
+          </div>
+        </div>
+
+        <div class="sheet-summary-grid">
+          <div class="s-box">
+            <div class="s-val" id="sheet-cont-name">40' High Cube</div>
+            <div class="s-lbl">集装箱柜型</div>
+          </div>
+          <div class="s-box">
+            <div class="s-val" id="sheet-total-cartons">0</div>
+            <div class="s-lbl">总装载外箱数 (CTNS)</div>
+          </div>
+          <div class="s-box">
+            <div class="s-val" id="sheet-total-pcs">0</div>
+            <div class="s-lbl">总产品只数 (Total Pcs)</div>
+          </div>
+          <div class="s-box">
+            <div class="s-val" id="sheet-util-cbm">0.0%</div>
+            <div class="s-lbl">容积利用率 (CBM Ratio)</div>
+          </div>
+        </div>
+
+        <table class="sheet-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>SKU 编号</th>
+              <th>产品品类说明 (Description)</th>
+              <th>外箱尺寸 (cm)</th>
+              <th>只/箱 (Pcs)</th>
+              <th>装载箱数</th>
+              <th>总只数</th>
+              <th>总体积 (CBM)</th>
+              <th>总毛重 (kg)</th>
+            </tr>
+          </thead>
+          <tbody id="sheet-table-body"></tbody>
+        </table>
+
+        <div class="sheet-footer">
+          <div>
+            <span>Verified by: <strong>Naike Logistics Engineering Lab</strong></span><br>
+            <span>Certifications: Disney FAMA (W128-4829-1), Coca-Cola SGP, Sedex SMETA</span>
+          </div>
+          <div style="text-align:right;">
+            <span>Estimated Ocean Freight Amortization: <strong id="sheet-freight-amort">$0.00 / pc</strong></span><br>
+            <span>Authorized Signature & Stamp: _______________________</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="nav-btn" id="btn-print-manifest"><i class="fa-solid fa-print"></i> 打印 / 另存为 PDF</button>
+      <button class="nav-btn primary" id="btn-modal-done">确定并返回</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS: THREE.JS R128 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+/* ==========================================================================
+   Naike Tableware (耐科餐具 · www.custombentofactory.com)
+   3D Container Loading Studio & Smart Packing Calculation Engine
+   Coordinate Mapping:
+     Algorithm (Packer): X = Container Length (cm), Y = Width (cm), Z = Height (cm)
+     Three.js: X = Algorithm X, Y = Algorithm Z (Height), Z = Algorithm Y (Width)
+   ========================================================================== */
+
+const SCALE = 0.01; // 1 cm = 0.01 Three.js units (meter scale)
+const EPS = 1e-6;
+
+/* --- 14 Real Naike Product Lines Dataset --- */
+const NAIKE_PRODUCTS = [
+  {
+    sku: "NK-KB5-001",
+    name: "儿童5格防漏便当盒",
+    nameEn: "Kids 5-Compartment Bento",
+    category: "bento",
+    cartonL: 54, cartonW: 38, cartonH: 42,
+    pcsPerCarton: 24,
+    weight: 14.5,
+    maxLayers: 6,
+    color: "#008290",
+    img: "images/eazylunch_kids_5_bento.jpg",
+    desc: "Bentgo 同款销冠 · 铂金硅胶分格密封 · 2米防摔"
+  },
+  {
+    sku: "NK-CHL-002",
+    name: "可注水保冷便当盒 (带冷凝托盘)",
+    nameEn: "Chill Bento with Freeze Ice Pack",
+    category: "bento",
+    cartonL: 48, cartonW: 36, cartonH: 28,
+    pcsPerCarton: 16,
+    weight: 12.0,
+    maxLayers: 7,
+    color: "#0284c7",
+    img: "images/eazylunch_chill_icepack_bento.jpg",
+    desc: "内置可拆卸保冷托盘 · 长效保鲜 6 小时"
+  },
+  {
+    sku: "NK-CLS4-003",
+    name: "经典四格成人分餐便当盒",
+    nameEn: "Classic 4-Portion Meal Prep Bento",
+    category: "bento",
+    cartonL: 50, cartonW: 36, cartonH: 32,
+    pcsPerCarton: 24,
+    weight: 13.0,
+    maxLayers: 6,
+    color: "#2563eb",
+    img: "images/eazylunch_4_bento_classic.jpg",
+    desc: "成人健身减脂控卡分餐 · 微波加热 PP5"
+  },
+  {
+    sku: "NK-STK2-004",
+    name: "日式双层成人手提便当盒",
+    nameEn: "Stackable Dual-Tier All-in-One Bento",
+    category: "bento",
+    cartonL: 46, cartonW: 39, cartonH: 28,
+    pcsPerCarton: 24,
+    weight: 10.8,
+    maxLayers: 7,
+    color: "#475569",
+    img: "images/eazylunch_stackable_2tier_bento.jpg",
+    desc: "双层 1200ml 大容量 · 内置一体式刀叉勺"
+  },
+  {
+    sku: "NK-TD4-009",
+    name: "幼童首选人体工学餐盒 (2-5岁)",
+    nameEn: "Toddler First Ergonomic Bento",
+    category: "bento",
+    cartonL: 46, cartonW: 32, cartonH: 24,
+    pcsPerCarton: 24,
+    weight: 10.2,
+    maxLayers: 8,
+    color: "#ec4899",
+    img: "images/eazylunch_toddler_bento.jpg",
+    desc: "单搭扣开合 · 850ml 科学分格 · 托儿所学前首选"
+  },
+  {
+    sku: "NK-WS3-006",
+    name: "天然小麦秸秆环保三格盒",
+    nameEn: "Eco Wheat Straw 3-Compartment Bento",
+    category: "eco",
+    cartonL: 44, cartonW: 42, cartonH: 46,
+    pcsPerCarton: 36,
+    weight: 11.5,
+    maxLayers: 6,
+    color: "#d97706",
+    img: "images/wheat_straw_bento_box.jpg",
+    desc: "40% 天然小麦秸秆生物基 · 环保可降解"
+  },
+  {
+    sku: "NK-SS3-003",
+    name: "重装 304 不锈钢三格盒",
+    nameEn: "Heavy-Duty SUS 304 3-Comp Bento",
+    category: "steel",
+    cartonL: 50, cartonW: 38, cartonH: 32,
+    pcsPerCarton: 20,
+    weight: 13.8,
+    maxLayers: 6,
+    color: "#64748b",
+    img: "images/eazylunch_stainless_3_bento.jpg",
+    desc: "18/8 纯正 SUS 304 · 零塑料食物接触面"
+  },
+  {
+    sku: "NK-MSS-008",
+    name: "黑科技可微波 304 不锈钢便当盒",
+    nameEn: "Microwave-Safe SUS 304 Bento",
+    category: "steel",
+    cartonL: 48, cartonW: 35, cartonH: 39,
+    pcsPerCarton: 24,
+    weight: 13.2,
+    maxLayers: 6,
+    color: "#06b6d4",
+    img: "images/microwave_stainless_bento_hero.jpg",
+    desc: "圆角反射屏蔽专利结构 · 微波炉安全加热"
+  },
+  {
+    sku: "NK-SNK-007",
+    name: "TikTok 爆款八格便携零食盒",
+    nameEn: "Viral Snackle Box Charcuterie",
+    category: "viral",
+    cartonL: 51, cartonW: 34, cartonH: 44,
+    pcsPerCarton: 12,
+    weight: 7.8,
+    maxLayers: 5,
+    color: "#f97316",
+    img: "images/snackle_box_hero.jpg",
+    desc: "欧美社媒现象级爆款 · 8格独立可拆卸分装"
+  },
+  {
+    sku: "NK-SLD-005",
+    name: "54oz 超大容量沙拉保鲜大碗",
+    nameEn: "54oz Leak-Proof Salad Bento Bowl",
+    category: "bowl",
+    cartonL: 61, cartonW: 41.5, cartonH: 38.5,
+    pcsPerCarton: 18,
+    weight: 9.2,
+    maxLayers: 5,
+    color: "#22c55e",
+    img: "images/salad_bento_bowl_hero.jpg",
+    desc: "超大碗深 · 独立酱料盒与配料层 · 100%防漏"
+  },
+  {
+    sku: "NK-BAG-010",
+    name: "600D rPET 环保保温便当包",
+    nameEn: "600D rPET Insulated Thermal Lunch Bag",
+    category: "bag",
+    cartonL: 55, cartonW: 43, cartonH: 36,
+    pcsPerCarton: 40,
+    weight: 10.5,
+    maxLayers: 7,
+    color: "#84cc16",
+    img: "images/insulated_lunch_bag.jpg",
+    desc: "加厚环保铝箔珍珠棉 · 长效保温 4-6 小时"
+  },
+  {
+    sku: "NK-THM-011",
+    name: "16oz 真空不锈钢保温汤罐/闷烧杯",
+    nameEn: "16oz Vacuum Food Flask Soup Thermos",
+    category: "thermos",
+    cartonL: 42, cartonW: 32, cartonH: 34,
+    pcsPerCarton: 24,
+    weight: 9.6,
+    maxLayers: 7,
+    color: "#6366f1",
+    img: "images/eazylunch_thermos_jar_combo.jpg",
+    desc: "双层抽真空保温 · 12小时锁温 · 广口易清洗"
+  },
+  {
+    sku: "NK-CUT-012",
+    name: "静音零晃动便携餐具三件套",
+    nameEn: "Rattle-Free Platinum Silicone Cutlery",
+    category: "cutlery",
+    cartonL: 45, cartonW: 28, cartonH: 26,
+    pcsPerCarton: 100,
+    weight: 12.0,
+    maxLayers: 8,
+    color: "#eab308",
+    img: "images/rattle_free_cutlery_hero.jpg",
+    desc: "铂金硅胶固定卡槽 · 随身携带零噪音碰撞"
+  },
+  {
+    sku: "NK-COL-014",
+    name: "食品级折叠硅胶便当盒",
+    nameEn: "Collapsible Food Silicone Bento",
+    category: "bento",
+    cartonL: 48, cartonW: 36, cartonH: 30,
+    pcsPerCarton: 36,
+    weight: 11.2,
+    maxLayers: 7,
+    color: "#14b8a6",
+    img: "images/collapsible_silicone_bento_hero.jpg",
+    desc: "折叠后厚度减少 60% · 露营便携收纳"
+  }
+];
+
+/* --- State Management --- */
+let activeCartonList = [];
+let lastPackingResult = null;
+let currentLanguage = 'zh'; // 'zh' or 'en'
+const typeVisibility = {};
+
+function uid() { return 'bx_' + Math.random().toString(36).slice(2, 9); }
+
+/* --- Bilingual Translations Dictionary --- */
+const I18N = {
+  zh: {
+    btnManifest: "导出装柜方案单",
+    btnInquire: "获取外贸报价 (RFQ)",
+    secContainer: "① 集装箱规格选择",
+    lblPreset: "标准海运集装箱预设",
+    lblLength: "长度 L (cm)",
+    lblWidth: "宽度 W (cm)",
+    lblHeight: "高度 H (cm)",
+    lblMaxWeight: "安全载重 (kg)",
+    lblOceanFreight: "海运整柜预算 (USD $)",
+    secProducts: "② 耐科专属品类外箱库",
+    lblSelectProduct: "快速选择耐科现模标准外箱",
+    btnFillFCL: "一键整柜装满 (FCL)",
+    btnAddToList: "加入拼柜列表",
+    btnMixedSample: "混装示例",
+    secBoxList: "③ 装箱外箱清单",
+    btnClear: "清空",
+    thName: "品名/SKU",
+    thL: "长", thW: "宽", thH: "高",
+    thPcs: "只/箱", thQty: "箱数", thWt: "箱重",
+    thStack: "叠", thCol: "色",
+    btnAddCustom: "添加自定义外箱规格",
+    secOptions: "④ 物理堆叠与防损约束",
+    lblRotation: "旋转规则",
+    lblSupport: "底面最小托底支撑率 %",
+    supportNotice: "* 支撑率设定为 70%：箱体底部须有 70% 面积被柜底或下层箱顶托住，避免外贸海运长途颠簸导致纸箱塌陷。",
+    btnRunPack: "立即执行 3D 智能装柜测算",
+    btnReplay: "装柜流水线动画",
+    btnResetCam: "复位视角",
+    kpiVolUtil: "空间利用率",
+    kpiCartons: "已装 / 计划箱数",
+    kpiUnits: "总产品只数 (Units)",
+    kpiWeight: "货物总毛重",
+    kpiCbm: "装载 / 柜内容积",
+    kpiCog: "重心偏移 (平衡度)",
+    kpiTime: "装载计算耗时",
+    lblAmortized: "单只便当盒分摊海运费:",
+    readyMsg: "准备就绪，点击开始装柜",
+    tglWalls: "柜壁",
+    tglEdges: "描边",
+    tglExplode: "分层展开",
+    lblSlice: "高度切片",
+    lblLegend: "箱型图例 (点击隐藏)",
+    modalTitle: "耐科外贸集装箱装载方案与装箱单 (Loading Manifest)"
+  },
+  en: {
+    btnManifest: "Export Loading Plan",
+    btnInquire: "Request Factory Quote",
+    secContainer: "① Container Specification",
+    lblPreset: "Standard Ocean Container Preset",
+    lblLength: "Length L (cm)",
+    lblWidth: "Width W (cm)",
+    lblHeight: "Height H (cm)",
+    lblMaxWeight: "Max Payload (kg)",
+    lblOceanFreight: "Container Ocean Freight (USD $)",
+    secProducts: "② Naike Product Line Library",
+    lblSelectProduct: "Quick Select Factory Outer Carton",
+    btnFillFCL: "Fill Full Container (FCL)",
+    btnAddToList: "Add to Mixed Cargo",
+    btnMixedSample: "Load Bestseller Mix",
+    secBoxList: "③ Packing Carton Manifest",
+    btnClear: "Clear",
+    thName: "Item / SKU",
+    thL: "L", thW: "W", thH: "H",
+    thPcs: "Pcs/Ctn", thQty: "Ctns", thWt: "GW(kg)",
+    thStack: "Stack", thCol: "Color",
+    btnAddCustom: "Add Custom Carton Spec",
+    secOptions: "④ Stacking & Cargo Safety",
+    lblRotation: "Rotation Rule",
+    lblSupport: "Min Bottom Support Ratio %",
+    supportNotice: "* 70% support ensures carton base is safely supported by lower layers, preventing crushing during sea freight.",
+    btnRunPack: "Run 3D Container Loading Engine",
+    btnReplay: "Replay Loading Flow",
+    btnResetCam: "Reset View",
+    kpiVolUtil: "Space Utilization",
+    kpiCartons: "Packed / Total Cartons",
+    kpiUnits: "Total Product Units",
+    kpiWeight: "Total Gross Weight",
+    kpiCbm: "Loaded / Total CBM",
+    kpiCog: "Center of Gravity",
+    kpiTime: "Calculation Time",
+    lblAmortized: "Ocean Freight Per Unit:",
+    readyMsg: "Ready to simulate container packing",
+    tglWalls: "Walls",
+    tglEdges: "Edges",
+    tglExplode: "Explode",
+    lblSlice: "Height Slice",
+    lblLegend: "Carton Legend (Toggle)",
+    modalTitle: "Naike Tableware Official Container Loading Manifest & Packing Plan"
+  }
+};
+
+function setLanguage(lang) {
+  currentLanguage = lang;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (I18N[lang] && I18N[lang][k]) el.textContent = I18N[lang][k];
+  });
+  renderProductDropdown();
+  updateCategoryPreview();
+  renderBoxTable();
+  if (lastPackingResult) updateStats(lastPackingResult);
+}
+
+document.getElementById('lang-switch-btn').addEventListener('click', () => {
+  setLanguage(currentLanguage === 'zh' ? 'en' : 'zh');
+});
+
+/* --- UI Controls Initialization --- */
+const productSelect = document.getElementById('naike-product-select');
+function renderProductDropdown() {
+  const currentVal = productSelect.value;
+  productSelect.innerHTML = '';
+  NAIKE_PRODUCTS.forEach((p, idx) => {
+    const opt = document.createElement('option');
+    opt.value = p.sku;
+    opt.textContent = `${p.sku} · ${currentLanguage === 'zh' ? p.name : p.nameEn} (${p.cartonL}×${p.cartonW}×${p.cartonH}cm, ${p.pcsPerCarton}pcs)`;
+    productSelect.appendChild(opt);
+  });
+  if (currentVal) productSelect.value = currentVal;
+}
+
+function updateCategoryPreview() {
+  const sku = productSelect.value;
+  const p = NAIKE_PRODUCTS.find(item => item.sku === sku) || NAIKE_PRODUCTS[0];
+  document.getElementById('pv-img').src = p.img;
+  document.getElementById('pv-name').textContent = currentLanguage === 'zh' ? p.name : p.nameEn;
+  document.getElementById('pv-sku').textContent = `SKU: ${p.sku} | ${p.pcsPerCarton} pcs/ctn`;
+  document.getElementById('pv-desc').textContent = `${p.cartonL} × ${p.cartonW} × ${p.cartonH} cm · ${p.weight} kg/箱 · ${p.desc}`;
+}
+
+productSelect.addEventListener('change', updateCategoryPreview);
+
+/* --- Container Preset Selector --- */
+const presetSelector = document.getElementById('preset-selector');
+const contL = document.getElementById('cont-l');
+const contW = document.getElementById('cont-w');
+const contH = document.getElementById('cont-h');
+const contMaxWeight = document.getElementById('cont-max-weight');
+const contCbmBadge = document.getElementById('container-cbm-badge');
+
+function updateContainerBadge() {
+  const cbm = ((+contL.value * +contW.value * +contH.value) / 1e6).toFixed(1);
+  contCbmBadge.textContent = `${cbm} m³`;
+}
+
+presetSelector.addEventListener('change', () => {
+  if (presetSelector.value !== 'custom') {
+    const [l, w, h, mw] = presetSelector.value.split(',').map(Number);
+    contL.value = l;
+    contW.value = w;
+    contH.value = h;
+    contMaxWeight.value = mw;
+    updateContainerBadge();
+  }
+});
+[contL, contW, contH].forEach(inp => inp.addEventListener('input', () => {
+  presetSelector.value = 'custom';
+  updateContainerBadge();
+}));
+
+/* --- Box Table Operations --- */
+const boxTableBody = document.getElementById('box-table-body');
+
+function renderBoxTable() {
+  boxTableBody.innerHTML = '';
+  activeCartonList.forEach((item, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input class="name-input" data-k="name" value="${item.name}"></td>
+      <td><input type="number" data-k="l" value="${item.l}" style="width:42px;"></td>
+      <td><input type="number" data-k="w" value="${item.w}" style="width:42px;"></td>
+      <td><input type="number" data-k="h" value="${item.h}" style="width:42px;"></td>
+      <td><input type="number" data-k="pcsPerCarton" value="${item.pcsPerCarton}" style="width:45px;"></td>
+      <td><input type="number" data-k="qty" value="${item.qty}" style="width:48px; font-weight:700; color:var(--brand-teal-light);"></td>
+      <td><input type="number" data-k="weight" value="${item.weight}" style="width:45px;"></td>
+      <td><input type="number" data-k="maxLayers" value="${item.maxLayers}" style="width:36px;" placeholder="∞"></td>
+      <td>
+        <div class="color-picker-wrap" style="background:${item.color};">
+          <input type="color" data-k="color" value="${item.color}">
+        </div>
+      </td>
+      <td><button class="del-row-btn" title="删除"><i class="fa-solid fa-xmark"></i></button></td>
+    `;
+
+    tr.querySelectorAll('input').forEach(inp => {
+      inp.addEventListener('input', e => {
+        const k = e.target.dataset.k;
+        let v = e.target.value;
+        if (['l', 'w', 'h', 'qty', 'weight', 'pcsPerCarton'].includes(k)) v = parseFloat(v) || 0;
+        if (k === 'maxLayers') v = (v === '' ? '' : parseInt(v) || '');
+        item[k] = v;
+        if (k === 'color') {
+          e.target.parentElement.style.background = v;
+          renderLegend();
+        }
+      });
+    });
+
+    tr.querySelector('.del-row-btn').addEventListener('click', () => {
+      activeCartonList.splice(index, 1);
+      renderBoxTable();
+      renderLegend();
+    });
+
+    boxTableBody.appendChild(tr);
+  });
+}
+
+function addProductToCartonList(sku, quantity = 200) {
+  const p = NAIKE_PRODUCTS.find(item => item.sku === sku) || NAIKE_PRODUCTS[0];
+  activeCartonList.push({
+    id: uid(),
+    sku: p.sku,
+    name: currentLanguage === 'zh' ? p.name : p.nameEn,
+    l: p.cartonL,
+    w: p.cartonW,
+    h: p.cartonH,
+    pcsPerCarton: p.pcsPerCarton,
+    qty: quantity,
+    weight: p.weight,
+    maxLayers: p.maxLayers,
+    color: p.color,
+    img: p.img
+  });
+  renderBoxTable();
+  renderLegend();
+}
+
+document.getElementById('btn-add-to-list').addEventListener('click', () => {
+  addProductToCartonList(productSelect.value, 150);
+});
+
+document.getElementById('btn-add-custom-row').addEventListener('click', () => {
+  activeCartonList.push({
+    id: uid(),
+    sku: "NK-CUSTOM",
+    name: currentLanguage === 'zh' ? "自定义纸箱" : "Custom Carton",
+    l: 50, w: 40, h: 30,
+    pcsPerCarton: 20,
+    qty: 100,
+    weight: 10.0,
+    maxLayers: 6,
+    color: "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'),
+    img: "images/eazylunch_kids_5_bento.jpg"
+  });
+  renderBoxTable();
+  renderLegend();
+});
+
+document.getElementById('btn-clear-table').addEventListener('click', () => {
+  activeCartonList = [];
+  renderBoxTable();
+  renderLegend();
+});
+
+/* --- One-Click FCL Maximizer --- */
+document.getElementById('btn-fill-fcl').addEventListener('click', () => {
+  const sku = productSelect.value;
+  const p = NAIKE_PRODUCTS.find(item => item.sku === sku) || NAIKE_PRODUCTS[0];
+  const cont = { L: +contL.value, W: +contW.value, H: +contH.value };
+  const maxPayload = +contMaxWeight.value || 26580;
+
+  // Theoretical max cartons based on volume efficiency factor (88%) and weight limit
+  const contCbm = (cont.L * cont.W * cont.H) / 1e6;
+  const cartonCbm = (p.cartonL * p.cartonW * p.cartonH) / 1e6;
+  const maxByVolume = Math.floor((contCbm * 0.88) / cartonCbm);
+  const maxByWeight = Math.floor(maxPayload / p.weight);
+  const estimatedCartons = Math.min(maxByVolume, maxByWeight);
+
+  activeCartonList = [{
+    id: uid(),
+    sku: p.sku,
+    name: currentLanguage === 'zh' ? p.name : p.nameEn,
+    l: p.cartonL,
+    w: p.cartonW,
+    h: p.cartonH,
+    pcsPerCarton: p.pcsPerCarton,
+    qty: estimatedCartons,
+    weight: p.weight,
+    maxLayers: p.maxLayers,
+    color: p.color,
+    img: p.img
+  }];
+
+  renderBoxTable();
+  renderLegend();
+  runPack(true);
+});
+
+/* --- Load Mixed Sample --- */
+function loadMixedSample() {
+  activeCartonList = [
+    {
+      id: uid(),
+      sku: "NK-KB5-001",
+      name: currentLanguage === 'zh' ? "儿童5格防漏便当盒" : "Kids 5-Comp Bento",
+      l: 54, w: 38, h: 42,
+      pcsPerCarton: 24, qty: 320, weight: 14.5, maxLayers: 6,
+      color: "#008290", img: "images/eazylunch_kids_5_bento.jpg"
+    },
+    {
+      id: uid(),
+      sku: "NK-MSS-008",
+      name: currentLanguage === 'zh' ? "微波304不锈钢盒" : "Microwave SUS304 Bento",
+      l: 48, w: 35, h: 39,
+      pcsPerCarton: 24, qty: 240, weight: 13.2, maxLayers: 6,
+      color: "#06b6d4", img: "images/microwave_stainless_bento_hero.jpg"
+    },
+    {
+      id: uid(),
+      sku: "NK-BAG-010",
+      name: currentLanguage === 'zh' ? "600D保温便当包" : "Thermal Lunch Bag",
+      l: 55, w: 43, h: 36,
+      pcsPerCarton: 40, qty: 180, weight: 10.5, maxLayers: 7,
+      color: "#84cc16", img: "images/insulated_lunch_bag.jpg"
+    },
+    {
+      id: uid(),
+      sku: "NK-SNK-007",
+      name: currentLanguage === 'zh' ? "TikTok爆款零食盒" : "Viral Snackle Box",
+      l: 51, w: 34, h: 44,
+      pcsPerCarton: 12, qty: 120, weight: 7.8, maxLayers: 5,
+      color: "#f97316", img: "images/snackle_box_hero.jpg"
+    }
+  ];
+  renderBoxTable();
+  renderLegend();
+}
+document.getElementById('btn-load-mixed').addEventListener('click', () => {
+  loadMixedSample();
+  runPack(true);
+});
+
+/* ==========================================================================
+   ALGORITHM: Empty Maximal Spaces (EMS) 3D Bin Packing Heuristic
+   ========================================================================== */
+function getOrientations(l, w, h, mode) {
+  let perms;
+  if (mode === '1') perms = [[l, w, h]];
+  else if (mode === '2') perms = [[l, w, h], [w, l, h]]; // Horizontal rotation only, vertical upright
+  else perms = [[l, w, h], [l, h, w], [w, l, h], [w, h, l], [h, l, w], [h, w, l]];
+
+  const key = p => p.join(','), seen = {}, out = [];
+  perms.forEach(p => {
+    if (!seen[key(p)]) {
+      seen[key(p)] = 1;
+      out.push({ dx: p[0], dy: p[1], dz: p[2] });
+    }
+  });
+  return out;
+}
+
+function intersects(a, b) {
+  return a.x < b.x + b.dx - EPS && a.x + a.w > b.x + EPS &&
+         a.y < b.y + b.dy - EPS && a.y + a.d > b.y + EPS &&
+         a.z < b.z + b.dz - EPS && a.z + a.h > b.z + EPS;
+}
+
+function contains(big, small) {
+  return big.x <= small.x + EPS && big.y <= small.y + EPS && big.z <= small.z + EPS &&
+         big.x + big.w >= small.x + small.w - EPS &&
+         big.y + big.d >= small.y + small.d - EPS &&
+         big.z + big.h >= small.z + small.h - EPS;
+}
+
+function splitSpaces(spaces, box) {
+  const out = [];
+  for (const s of spaces) {
+    if (!intersects(s, box)) { out.push(s); continue; }
+    if (box.x - s.x > EPS) out.push({ x: s.x, y: s.y, z: s.z, w: box.x - s.x, d: s.d, h: s.h });
+    if ((s.x + s.w) - (box.x + box.dx) > EPS) out.push({ x: box.x + box.dx, y: s.y, z: s.z, w: (s.x + s.w) - (box.x + box.dx), d: s.d, h: s.h });
+    if (box.y - s.y > EPS) out.push({ x: s.x, y: s.y, z: s.z, w: s.w, d: box.y - s.y, h: s.h });
+    if ((s.y + s.d) - (box.y + box.dy) > EPS) out.push({ x: s.x, y: box.y + box.dy, z: s.z, w: s.w, d: (s.y + s.d) - (box.y + box.dy), h: s.h });
+    if (box.z - s.z > EPS) out.push({ x: s.x, y: s.y, z: s.z, w: s.w, d: s.d, h: box.z - s.z });
+    if ((s.z + s.h) - (box.z + box.dz) > EPS) out.push({ x: s.x, y: s.y, z: box.z + box.dz, w: s.w, d: s.d, h: (s.z + s.h) - (box.z + box.dz) });
+  }
+  return out;
+}
+
+function pruneSpaces(spaces) {
+  const valid = spaces.filter(s => s.w > EPS && s.d > EPS && s.h > EPS);
+  const keep = [];
+  for (let i = 0; i < valid.length; i++) {
+    let contained = false;
+    for (let j = 0; j < valid.length; j++) {
+      if (i !== j && contains(valid[j], valid[i])) {
+        if (!(contains(valid[i], valid[j]) && j > i)) { contained = true; break; }
+      }
+    }
+    if (!contained) keep.push(valid[i]);
+  }
+  return keep;
+}
+
+function supportRatio(cand, placed) {
+  if (cand.z < EPS) return 1; // Base floor is 100% supported
+  const area = cand.dx * cand.dy;
+  let supportedArea = 0;
+  for (const p of placed) {
+    if (Math.abs((p.z + p.dz) - cand.z) > 1.2) continue; // Must align with bottom of candidate box (1.2cm tolerance)
+    const ox = Math.max(0, Math.min(cand.x + cand.dx, p.x + p.dx) - Math.max(cand.x, p.x));
+    const oy = Math.max(0, Math.min(cand.y + cand.dy, p.y + p.dy) - Math.max(cand.y, p.y));
+    supportedArea += ox * oy;
+  }
+  return supportedArea / area;
+}
+
+function pack(container, types, opts) {
+  const t0 = performance.now();
+  let items = [];
+  types.forEach(bt => {
+    const q = Math.max(0, Math.floor(bt.qty || 0));
+    for (let i = 0; i < q; i++) {
+      items.push({
+        typeId: bt.id,
+        sku: bt.sku,
+        name: bt.name,
+        l: bt.l, w: bt.w, h: bt.h,
+        pcsPerCarton: bt.pcsPerCarton || 1,
+        weight: bt.weight || 0,
+        maxLayers: (bt.maxLayers === '' ? 0 : bt.maxLayers),
+        color: bt.color,
+        img: bt.img
+      });
+    }
+  });
+
+  // Priority sorting: Heavy items first, then volume descending
+  items.sort((a, b) => (b.weight - a.weight) || ((b.l * b.w * b.h) - (a.l * a.w * a.h)));
+
+  let spaces = [{ x: 0, y: 0, z: 0, w: container.L, d: container.W, h: container.H }];
+  const placed = [], unpackedCount = {};
+  const minSup = opts.minSupport;
+
+  for (const it of items) {
+    const ors = getOrientations(it.l, it.w, it.h, opts.rotMode);
+    let best = null;
+    for (const s of spaces) {
+      for (const o of ors) {
+        if (o.dx <= s.w + EPS && o.dy <= s.d + EPS && o.dz <= s.h + EPS) {
+          if (it.maxLayers > 0 && s.z > (it.maxLayers - 1) * o.dz + EPS) continue;
+          const cand = { x: s.x, y: s.y, z: s.z, dx: o.dx, dy: o.dy, dz: o.dz };
+          if (supportRatio(cand, placed) < minSup - EPS) continue;
+          const score = [s.z, s.y, s.x]; // Bottom -> Depth -> Width priority
+          if (!best || lexLess(score, best.score)) best = { cand, score };
+        }
+      }
+    }
+    if (!best) {
+      unpackedCount[it.name] = (unpackedCount[it.name] || 0) + 1;
+      continue;
+    }
+    const p = Object.assign({
+      typeId: it.typeId,
+      sku: it.sku,
+      name: it.name,
+      color: it.color,
+      weight: it.weight,
+      pcsPerCarton: it.pcsPerCarton,
+      img: it.img
+    }, best.cand);
+    placed.push(p);
+    spaces = pruneSpaces(splitSpaces(spaces, p));
+  }
+
+  // Aggregate Metrics
+  const contVol = container.L * container.W * container.H;
+  let usedVol = 0, totW = 0, totPcs = 0, cog = { x: 0, y: 0, z: 0 };
+  placed.forEach(p => {
+    const v = p.dx * p.dy * p.dz;
+    usedVol += v;
+    totW += p.weight;
+    totPcs += p.pcsPerCarton;
+    const cx = p.x + p.dx / 2, cy = p.y + p.dy / 2, cz = p.z + p.dz / 2;
+    cog.x += cx * (p.weight || 0.001);
+    cog.y += cy * (p.weight || 0.001);
+    cog.z += cz * (p.weight || 0.001);
+  });
+
+  const wSum = placed.reduce((a, p) => a + (p.weight || 0.001), 0) || 1;
+  cog.x /= wSum; cog.y /= wSum; cog.z /= wSum;
+
+  return {
+    placed,
+    unpackedCount,
+    contVol,
+    usedVol,
+    totW,
+    totPcs,
+    cog,
+    container,
+    total: items.length,
+    ms: (performance.now() - t0)
+  };
+}
+
+function lexLess(a, b) {
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] < b[i] - EPS) return true;
+    if (a[i] > b[i] + EPS) return false;
+  }
+  return false;
+}
+
+/* ==========================================================================
+   THREE.JS 3D SCENE & INTERACTION
+   ========================================================================== */
+let scene, camera, renderer, containerGroup, boxGroup, edgeGroup;
+let raycaster, mouse;
+let hoveredMesh = null;
+let camState = { theta: 0.85, phi: 1.05, radius: 24, target: new THREE.Vector3(0, 1.2, 0) };
+const canvasWrap = document.getElementById('webgl-canvas-wrap');
+const tooltipEl = document.getElementById('box-tooltip');
+
+function initThree() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0d12);
+
+  camera = new THREE.PerspectiveCamera(45, canvasWrap.clientWidth / canvasWrap.clientHeight, 0.05, 3000);
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvasWrap.clientWidth, canvasWrap.clientHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  canvasWrap.appendChild(renderer.domElement);
+
+  // Lighting
+  const ambient = new THREE.AmbientLight(0xffffff, 0.8);
+  scene.add(ambient);
+
+  const mainLight = new THREE.DirectionalLight(0xffffff, 0.75);
+  mainLight.position.set(15, 30, 20);
+  mainLight.castShadow = true;
+  mainLight.shadow.mapSize.width = 2048;
+  mainLight.shadow.mapSize.height = 2048;
+  scene.add(mainLight);
+
+  const fillLight = new THREE.DirectionalLight(0x0ea5b6, 0.35);
+  fillLight.position.set(-20, 15, -15);
+  scene.add(fillLight);
+
+  containerGroup = new THREE.Group(); scene.add(containerGroup);
+  boxGroup = new THREE.Group(); scene.add(boxGroup);
+  edgeGroup = new THREE.Group(); edgeGroup.visible = false; scene.add(edgeGroup);
+
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
+
+  bindOrbitAndRaycast();
+  updateCamera();
+  animate();
+  window.addEventListener('resize', onResize);
+}
+
+function onResize() {
+  camera.aspect = canvasWrap.clientWidth / canvasWrap.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(canvasWrap.clientWidth, canvasWrap.clientHeight);
+}
+
+function updateCamera() {
+  const s = camState;
+  s.phi = Math.max(0.05, Math.min(Math.PI - 0.05, s.phi));
+  const x = s.target.x + s.radius * Math.sin(s.phi) * Math.cos(s.theta);
+  const y = s.target.y + s.radius * Math.cos(s.phi);
+  const z = s.target.z + s.radius * Math.sin(s.phi) * Math.sin(s.theta);
+  camera.position.set(x, y, z);
+  camera.lookAt(s.target);
+}
+
+/* Touch & Mouse Controls + Hover Raycasting */
+function bindOrbitAndRaycast() {
+  const el = renderer.domElement;
+  let mode = 0, px = 0, py = 0;
+  let initialPinchDist = null;
+
+  el.addEventListener('contextmenu', e => e.preventDefault());
+
+  el.addEventListener('mousedown', e => {
+    mode = (e.button === 2 || e.shiftKey) ? 2 : 1;
+    px = e.clientX; py = e.clientY;
+  });
+
+  window.addEventListener('mouseup', () => { mode = 0; });
+
+  window.addEventListener('mousemove', e => {
+    if (mode) {
+      const dx = e.clientX - px, dy = e.clientY - py;
+      px = e.clientX; py = e.clientY;
+      if (mode === 1) {
+        camState.theta -= dx * 0.007;
+        camState.phi -= dy * 0.007;
+      } else {
+        const s = camState;
+        const right = new THREE.Vector3(), up = new THREE.Vector3(0, 1, 0);
+        right.crossVectors(new THREE.Vector3().subVectors(camera.position, s.target), up).normalize();
+        const trueUp = new THREE.Vector3().crossVectors(right, new THREE.Vector3().subVectors(camera.position, s.target)).normalize();
+        const f = s.radius * 0.0015;
+        s.target.addScaledVector(right, -dx * f);
+        s.target.addScaledVector(trueUp, dy * f);
+      }
+      updateCamera();
+      tooltipEl.style.display = 'none';
+      return;
+    }
+
+    // Raycast hover check
+    const rect = el.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const visibleBoxes = boxGroup.children.filter(m => m.visible);
+    const intersects = raycaster.intersectObjects(visibleBoxes);
+
+    if (intersects.length > 0) {
+      const hit = intersects[0].object;
+      if (hoveredMesh !== hit) {
+        if (hoveredMesh) hoveredMesh.material.emissive?.setHex(0x000000);
+        hoveredMesh = hit;
+        if (hoveredMesh.material.emissive) hoveredMesh.material.emissive.setHex(0x223344);
+      }
+      const d = hit.userData;
+      tooltipEl.style.display = 'block';
+      tooltipEl.style.left = e.clientX + 'px';
+      tooltipEl.style.top = e.clientY + 'px';
+      document.getElementById('tt-name').textContent = d.name;
+      document.getElementById('tt-sku').textContent = `SKU: ${d.sku}`;
+      document.getElementById('tt-dims').textContent = `${d.dx} × ${d.dy} × ${d.dz} cm`;
+      document.getElementById('tt-pcs').textContent = `${d.pcsPerCarton} pcs/箱`;
+      document.getElementById('tt-wt').textContent = `${d.weight} kg`;
+      document.getElementById('tt-pos').textContent = `X:${d.px.toFixed(0)}, Y:${d.py.toFixed(0)}, Z:${d.pz.toFixed(0)} cm`;
+      document.getElementById('tt-layer').textContent = `第 ${Math.round(d.pz / Math.max(1, d.dz)) + 1} 层 (H:${(d.pz + d.dz).toFixed(0)}cm)`;
+    } else {
+      if (hoveredMesh) {
+        hoveredMesh.material.emissive?.setHex(0x000000);
+        hoveredMesh = null;
+      }
+      tooltipEl.style.display = 'none';
+    }
+  });
+
+  el.addEventListener('wheel', e => {
+    e.preventDefault();
+    camState.radius *= (1 + Math.sign(e.deltaY) * 0.08);
+    camState.radius = Math.max(3, Math.min(300, camState.radius));
+    updateCamera();
+  }, { passive: false });
+
+  // Touch Support
+  el.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) {
+      mode = 1;
+      px = e.touches[0].clientX;
+      py = e.touches[0].clientY;
+    } else if (e.touches.length === 2) {
+      mode = 3; // Pinch zoom
+      initialPinchDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  }, { passive: true });
+
+  el.addEventListener('touchmove', e => {
+    if (mode === 1 && e.touches.length === 1) {
+      const dx = e.touches[0].clientX - px, dy = e.touches[0].clientY - py;
+      px = e.touches[0].clientX; py = e.touches[0].clientY;
+      camState.theta -= dx * 0.007;
+      camState.phi -= dy * 0.007;
+      updateCamera();
+    } else if (mode === 3 && e.touches.length === 2 && initialPinchDist) {
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const factor = initialPinchDist / dist;
+      camState.radius *= (factor > 1 ? 1.04 : 0.96);
+      camState.radius = Math.max(3, Math.min(300, camState.radius));
+      initialPinchDist = dist;
+      updateCamera();
+    }
+  }, { passive: true });
+
+  el.addEventListener('touchend', () => { mode = 0; initialPinchDist = null; });
+}
+
+let animT = 0, animMax = 0, isAnimating = false;
+function animate() {
+  requestAnimationFrame(animate);
+  if (isAnimating) {
+    animT += 1.2;
+    boxGroup.children.forEach(m => { m.visible = m.userData.order <= animT; });
+    edgeGroup.children.forEach(m => { m.visible = edgeGroup.visible && m.userData.order <= animT; });
+    if (animT >= animMax) {
+      isAnimating = false;
+      applySlice();
+    }
+  }
+  renderer.render(scene, camera);
+}
+
+/* --- Build 3D Container --- */
+function buildContainer(c) {
+  containerGroup.clear();
+  const L = c.L * SCALE, W = c.W * SCALE, H = c.H * SCALE;
+  const ox = -L / 2, oy = 0, oz = -W / 2;
+  containerGroup.position.set(ox, oy, oz);
+
+  // Floor
+  const floorGeo = new THREE.BoxGeometry(L, 0.04, W);
+  const floorMat = new THREE.MeshStandardMaterial({ color: 0x1f2937, roughness: 0.9 });
+  const floor = new THREE.Mesh(floorGeo, floorMat);
+  floor.position.set(L / 2, -0.02, W / 2);
+  containerGroup.add(floor);
+
+  // Ground Grid
+  const grid = new THREE.GridHelper(Math.max(L, W) * 1.4, Math.round(Math.max(L, W) * 1.4 / 0.5), 0x374151, 0x1f2937);
+  grid.position.set(L / 2, 0.002, W / 2);
+  containerGroup.add(grid);
+
+  // Semi-transparent Container Walls
+  const wallMat = new THREE.MeshStandardMaterial({
+    color: 0x008290,
+    transparent: true,
+    opacity: 0.08,
+    side: THREE.DoubleSide
+  });
+
+  function addWall(w, h, d, x, y, z) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat);
+    m.position.set(x, y, z);
+    m.userData.wall = 1;
+    containerGroup.add(m);
+  }
+
+  addWall(L, H, 0.02, L / 2, H / 2, 0); // Back
+  addWall(0.02, H, W, 0, H / 2, W / 2); // Left Door
+  addWall(L, H, 0.02, L / 2, H / 2, W); // Front Wall
+
+  // Outer Container Framework Line Edges
+  const edgeLines = new THREE.LineSegments(
+    new THREE.EdgesGeometry(new THREE.BoxGeometry(L, H, W)),
+    new THREE.LineBasicMaterial({ color: 0x008290, linewidth: 2 })
+  );
+  edgeLines.position.set(L / 2, H / 2, W / 2);
+  containerGroup.add(edgeLines);
+}
+
+/* --- Build 3D Cartons --- */
+function buildBoxes(res) {
+  boxGroup.clear();
+  edgeGroup.clear();
+  const c = res.container;
+  const ox = -c.L * SCALE / 2, oz = -c.W * SCALE / 2;
+  const gap = 0.35; // Visual separation gap in cm
+
+  res.placed.forEach((p, idx) => {
+    const dx = Math.max(0.05, (p.dx - gap) * SCALE);
+    const dy = Math.max(0.05, (p.dz - gap) * SCALE); // Height is mapped to Y in Three.js
+    const dz = Math.max(0.05, (p.dy - gap) * SCALE); // Depth is mapped to Z in Three.js
+
+    const geo = new THREE.BoxGeometry(dx, dy, dz);
+    const col = new THREE.Color(p.color);
+    const mat = new THREE.MeshStandardMaterial({
+      color: col,
+      roughness: 0.5,
+      metalness: 0.05
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+
+    const tx = ox + (p.x + p.dx / 2) * SCALE;
+    const ty = (p.z + p.dz / 2) * SCALE;
+    const tz = oz + (p.y + p.dy / 2) * SCALE;
+
+    mesh.position.set(tx, ty, tz);
+    mesh.userData = {
+      typeId: p.typeId,
+      sku: p.sku,
+      name: p.name,
+      order: idx,
+      baseY: ty,
+      topZ: (p.z + p.dz),
+      dx: p.dx, dy: p.dy, dz: p.dz,
+      px: p.x, py: p.y, pz: p.z,
+      weight: p.weight,
+      pcsPerCarton: p.pcsPerCarton,
+      img: p.img
+    };
+    boxGroup.add(mesh);
+
+    // Box Edge Outline
+    const eg = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geo),
+      new THREE.LineBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.6 })
+    );
+    eg.position.copy(mesh.position);
+    eg.userData = { typeId: p.typeId, order: idx };
+    edgeGroup.add(eg);
+  });
+
+  applyTypeVisibility();
+  applySlice();
+}
+
+/* --- Visibility & Slice Filtering --- */
+function applyTypeVisibility() {
+  boxGroup.children.forEach(m => {
+    if (typeVisibility[m.userData.typeId] === false) m.visible = false;
+  });
+  edgeGroup.children.forEach(m => {
+    if (typeVisibility[m.userData.typeId] === false) m.visible = false;
+  });
+}
+
+let sliceFrac = 1;
+function applySlice() {
+  if (!lastPackingResult) return;
+  const maxZ = lastPackingResult.container.H;
+  const limit = maxZ * sliceFrac;
+  boxGroup.children.forEach(m => {
+    let v = typeVisibility[m.userData.typeId] !== false;
+    if (m.userData.topZ > limit + EPS) v = false;
+    if (isAnimating && m.userData.order > animT) v = false;
+    m.visible = v;
+  });
+  edgeGroup.children.forEach((m, i) => {
+    const bm = boxGroup.children[i];
+    m.visible = edgeGroup.visible && bm && bm.visible;
+  });
+}
+
+/* --- Stats & KPI Update --- */
+function updateStats(res) {
+  const util = res.contVol > 0 ? (res.usedVol / res.contVol) * 100 : 0;
+  document.getElementById('kpi-util-big').textContent = util.toFixed(1) + '%';
+  document.getElementById('kpi-util-bar').style.width = Math.min(100, util) + '%';
+
+  const packed = res.placed.length;
+  document.getElementById('kpi-packed-cartons').textContent = `${packed} / ${res.total}`;
+  document.getElementById('kpi-total-pcs').textContent = `${res.totPcs.toLocaleString()} Pcs`;
+  document.getElementById('kpi-total-weight').textContent = `${res.totW.toFixed(0)} kg`;
+  document.getElementById('kpi-total-cbm').textContent = `${(res.usedVol / 1e6).toFixed(2)} / ${(res.contVol / 1e6).toFixed(2)} m³`;
+  document.getElementById('kpi-calc-time').textContent = `${res.ms.toFixed(0)} ms`;
+
+  // Center of gravity deviation
+  const c = res.container;
+  const offX = (res.cog.x / c.L - 0.5) * 100;
+  const offY = (res.cog.y / c.W - 0.5) * 100;
+  const offset = Math.hypot(offX, offY);
+  const cogEl = document.getElementById('kpi-cog-offset');
+  cogEl.textContent = offset.toFixed(1) + '%';
+  cogEl.style.color = offset > 15 ? 'var(--accent-red)' : offset > 8 ? 'var(--accent-orange)' : 'var(--accent-green)';
+
+  // Ocean Freight Per Unit Amortization
+  const freightTotal = +document.getElementById('ocean-freight').value || 0;
+  const freightPerUnit = (freightTotal > 0 && res.totPcs > 0) ? (freightTotal / res.totPcs) : 0;
+  document.getElementById('kpi-freight-per-pc').textContent = `$${freightPerUnit.toFixed(3)} / pc`;
+
+  // Weight Safety Compliance
+  const maxPayload = +document.getElementById('cont-max-weight').value || 26580;
+  const unpackedEl = document.getElementById('kpi-unpacked-box');
+  const unpackedKeys = Object.keys(res.unpackedCount);
+
+  if (res.totW > maxPayload) {
+    unpackedEl.className = 'unpacked-warning';
+    unpackedEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> 超重预警: 货物总重超限载 ${(res.totW - maxPayload).toFixed(0)} kg!`;
+  } else if (unpackedKeys.length) {
+    unpackedEl.className = 'unpacked-warning';
+    unpackedEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> 未装下: ` +
+      unpackedKeys.map(k => `${k}×${res.unpackedCount[k]}`).join('，');
+  } else {
+    unpackedEl.className = 'unpacked-warning success';
+    unpackedEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> 全部 ${packed} 箱商品装载完成 · 载重合规`;
+  }
+}
+
+/* --- Legend Rendering --- */
+function renderLegend() {
+  const box = document.getElementById('legend-items-wrap');
+  box.innerHTML = '';
+  document.getElementById('legend-total-sku').textContent = `${activeCartonList.length} SKU`;
+
+  activeCartonList.forEach(t => {
+    if (typeVisibility[t.id] === undefined) typeVisibility[t.id] = true;
+    const cnt = lastPackingResult ? lastPackingResult.placed.filter(p => p.typeId === t.id).length : t.qty;
+    const item = document.createElement('div');
+    item.className = 'legend-item' + (typeVisibility[t.id] === false ? ' hidden-box' : '');
+    item.innerHTML = `
+      <span class="legend-swatch" style="background:${t.color}"></span>
+      <span class="legend-name" title="${t.name}">${t.name}</span>
+      <span class="legend-counts">${cnt}箱 (${cnt * t.pcsPerCarton}只)</span>
+    `;
+    item.addEventListener('click', () => {
+      typeVisibility[t.id] = !(typeVisibility[t.id] !== false);
+      renderLegend();
+      applySlice();
+    });
+    box.appendChild(item);
+  });
+}
+
+/* ==========================================================================
+   MAIN PACKING TRIGGER & VIEWPORT ACTIONS
+   ========================================================================== */
+function runPack(animateLoad = true) {
+  const container = {
+    L: +contL.value,
+    W: +contW.value,
+    H: +contH.value
+  };
+  if (!(container.L > 0 && container.W > 0 && container.H > 0)) {
+    alert(currentLanguage === 'zh' ? '请填写有效的集装箱尺寸' : 'Please input valid container dimensions');
+    return;
+  }
+  if (!activeCartonList.length) {
+    alert(currentLanguage === 'zh' ? '请至少添加一种外箱商品' : 'Please add at least one carton type');
+    return;
+  }
+
+  const opts = {
+    rotMode: document.getElementById('rot-mode').value,
+    minSupport: (+document.getElementById('min-support').value || 0) / 100
+  };
+
+  const res = pack(container, activeCartonList, opts);
+  lastPackingResult = res;
+
+  buildContainer(container);
+  buildBoxes(res);
+  updateStats(res);
+  renderLegend();
+
+  // Camera Auto-Framing
+  camState.radius = Math.max(container.L, container.W, container.H) * SCALE * 2.0;
+  camState.target.set(0, container.H * SCALE * 0.4, 0);
+  camState.theta = 0.85;
+  camState.phi = 1.05;
+  updateCamera();
+
+  document.getElementById('hud-text').textContent =
+    `装载 ${res.placed.length} 箱 (${res.totPcs.toLocaleString()} 只) · 耗时 ${res.ms.toFixed(0)}ms · 拖拽旋转 · 悬停详情`;
+
+  if (animateLoad) {
+    animMax = res.placed.length + 2;
+    animT = 0;
+    isAnimating = true;
+  }
+}
+
+document.getElementById('btn-run-pack').addEventListener('click', () => runPack(true));
+document.getElementById('btn-replay-anim').addEventListener('click', () => {
+  if (lastPackingResult) {
+    animMax = lastPackingResult.placed.length + 2;
+    animT = 0;
+    isAnimating = true;
+  }
+});
+document.getElementById('btn-reset-cam').addEventListener('click', () => {
+  camState.theta = 0.85;
+  camState.phi = 1.05;
+  if (lastPackingResult) {
+    camState.radius = Math.max(lastPackingResult.container.L, lastPackingResult.container.W, lastPackingResult.container.H) * SCALE * 2.0;
+  }
+  updateCamera();
+});
+
+/* Camera Preset Angles */
+document.getElementById('cam-iso').addEventListener('click', () => {
+  camState.theta = 0.85; camState.phi = 1.05; updateCamera();
+});
+document.getElementById('cam-front').addEventListener('click', () => {
+  camState.theta = Math.PI; camState.phi = Math.PI / 2; updateCamera();
+});
+document.getElementById('cam-side').addEventListener('click', () => {
+  camState.theta = Math.PI / 2; camState.phi = Math.PI / 2; updateCamera();
+});
+document.getElementById('cam-top').addEventListener('click', () => {
+  camState.theta = 0; camState.phi = 0.05; updateCamera();
+});
+
+/* View Toggles */
+const tglWalls = document.getElementById('tgl-walls');
+tglWalls.addEventListener('click', () => {
+  tglWalls.classList.toggle('active');
+  const on = tglWalls.classList.contains('active');
+  containerGroup.children.forEach(m => { if (m.userData.wall) m.visible = on; });
+});
+
+const tglEdges = document.getElementById('tgl-edges');
+tglEdges.addEventListener('click', () => {
+  tglEdges.classList.toggle('active');
+  edgeGroup.visible = tglEdges.classList.contains('active');
+  applySlice();
+});
+
+const tglExplode = document.getElementById('tgl-explode');
+tglExplode.addEventListener('click', () => {
+  tglExplode.classList.toggle('active');
+  const on = tglExplode.classList.contains('active');
+  boxGroup.children.forEach((m, i) => {
+    const layer = Math.round(m.userData.baseY / 0.35);
+    const off = on ? layer * 0.16 : 0;
+    m.position.y = m.userData.baseY + off;
+    if (edgeGroup.children[i]) edgeGroup.children[i].position.y = m.position.y;
+  });
+});
+
+document.getElementById('slice-slider').addEventListener('input', e => {
+  sliceFrac = (+e.target.value) / 100;
+  applySlice();
+});
+
+/* ==========================================================================
+   CONTAINER LOADING MANIFEST EXPORT MODAL
+   ========================================================================== */
+const manifestModal = document.getElementById('manifest-modal');
+document.getElementById('open-manifest-btn').addEventListener('click', () => {
+  if (!lastPackingResult) runPack(false);
+  populateManifest(lastPackingResult);
+  manifestModal.classList.add('open');
+});
+
+document.getElementById('btn-close-modal').addEventListener('click', () => {
+  manifestModal.classList.remove('open');
+});
+document.getElementById('btn-modal-done').addEventListener('click', () => {
+  manifestModal.classList.remove('open');
+});
+
+document.getElementById('btn-print-manifest').addEventListener('click', () => {
+  window.print();
+});
+
+function populateManifest(res) {
+  if (!res) return;
+  document.getElementById('sheet-date').textContent = new Date().toLocaleDateString();
+  const presetName = presetSelector.options[presetSelector.selectedIndex].text.split('(')[0].trim();
+  document.getElementById('sheet-cont-name').textContent = presetName || "Container";
+  document.getElementById('sheet-total-cartons').textContent = `${res.placed.length} 箱`;
+  document.getElementById('sheet-total-pcs').textContent = `${res.totPcs.toLocaleString()} 只`;
+  document.getElementById('sheet-util-cbm').textContent = `${(res.usedVol / res.contVol * 100).toFixed(1)}%`;
+
+  const freightTotal = +document.getElementById('ocean-freight').value || 0;
+  const freightPerUnit = (freightTotal > 0 && res.totPcs > 0) ? (freightTotal / res.totPcs) : 0;
+  document.getElementById('sheet-freight-amort').textContent = `$${freightPerUnit.toFixed(3)} / pc (Est. Total $${freightTotal})`;
+
+  const tbody = document.getElementById('sheet-table-body');
+  tbody.innerHTML = '';
+
+  activeCartonList.forEach((t, i) => {
+    const placedCartons = res.placed.filter(p => p.typeId === t.id).length;
+    const totalPcs = placedCartons * t.pcsPerCarton;
+    const cbmPerCtn = (t.l * t.w * t.h) / 1e6;
+    const totalCbm = (cbmPerCtn * placedCartons).toFixed(2);
+    const totalGw = (t.weight * placedCartons).toFixed(1);
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i + 1}</td>
+      <td><strong>${t.sku || 'NK-STD'}</strong></td>
+      <td>${t.name}</td>
+      <td>${t.l} × ${t.w} × ${t.h}</td>
+      <td class="num">${t.pcsPerCarton}</td>
+      <td class="num">${placedCartons}</td>
+      <td class="num"><strong>${totalPcs.toLocaleString()}</strong></td>
+      <td class="num">${totalCbm}</td>
+      <td class="num">${totalGw}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ==========================================================================
+   INITIALIZATION
+   ========================================================================== */
+renderProductDropdown();
+updateCategoryPreview();
+initThree();
+loadMixedSample();
+runPack(false);
+</script>
+</body>
+</html>
